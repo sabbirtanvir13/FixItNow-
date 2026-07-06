@@ -7,6 +7,7 @@ import { AuthController,  } from "./auth.controller";
   
  router.post("/login", AuthController.loginUser);
 
+router.get("/me", AuthController.getMe);
 
 
  export const  userRoutes=router;

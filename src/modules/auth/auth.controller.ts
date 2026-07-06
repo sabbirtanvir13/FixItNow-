@@ -7,6 +7,8 @@ import { catchAsync } from "../../utlis/catchAsync";
 import { sendResponse } from "../../utlis/sendResponse";
 
 import { NextFunction } from "express";
+import config from "../../config";
+import { jwtUtils } from "../../utlis/jwt";
 
 const RegisterUser = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
@@ -53,7 +55,34 @@ const loginUser = catchAsync(async (req: Request, res: Response,next: NextFuncti
   });
 });
 
+
+const getMe = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { accessToken } = req.cookies;
+    
+
+    const VerifiedtokenResponse = jwtUtils.verifyToken(
+      accessToken,
+      config.jwt_access_secret,
+    ) as any;
+
+    if (typeof VerifiedtokenResponse === "string") {
+      throw new Error(VerifiedtokenResponse);
+    }
+
+    const profile = await AuthService.getMeIntoBD(VerifiedtokenResponse.id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "User profile fetched successfully",
+      data: { profile },
+    });
+  },
+);
+
 export const AuthController = {
   RegisterUser,
   loginUser,
+  getMe
 };
