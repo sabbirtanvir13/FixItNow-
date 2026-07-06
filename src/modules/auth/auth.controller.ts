@@ -1,9 +1,10 @@
-
+;
 
 import httpStatus from "http-status";
-import { Request, Response,  } from "express";
+import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
 import { catchAsync } from "../../utlis/catchAsync";
+import { sendResponse } from "../../utlis/sendResponse";
 
 
 
@@ -12,13 +13,11 @@ const RegisterUser = catchAsync(async (req: Request, res: Response) => {
 
   const user = await AuthService.RegisterUserIntoDB(payload);
 
-  return res.status(httpStatus.CREATED).json({
+  return sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
     message: "Registration successful",
-    data: {
-      user,
-    },
+    data: user,
   });
 });
 
