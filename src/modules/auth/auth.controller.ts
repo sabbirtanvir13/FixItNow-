@@ -6,7 +6,7 @@ import { AuthService } from "./auth.service";
 import { catchAsync } from "../../utlis/catchAsync";
 import { sendResponse } from "../../utlis/sendResponse";
 
-
+import { NextFunction } from "express";
 
 const RegisterUser = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
@@ -21,6 +21,39 @@ const RegisterUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+
+const loginUser = catchAsync(async (req: Request, res: Response,next: NextFunction) => {
+   const payload = req.body;
+   
+   const {accessToken, refreshToken} = await AuthService.loginUserIntoDB(payload);
+
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "none",
+      maxAge: 1000 * 60 * 60 * 24,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "none",
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+
+
+
+ sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Login successful",
+    data: { accessToken, refreshToken },
+  });
+});
+
 export const AuthController = {
   RegisterUser,
+  loginUser,
 };

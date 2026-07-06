@@ -7,10 +7,11 @@ export default {
     DATABASE_URL: process.env.DATABASE_URL,
     app_url: process.env.APP_URL,
     bcrypt_Salt_Rounds: process.env.BCRYPT_SALT_ROUNDS ,
-    jwt_access_Secret: process.env.JWT_SECRET,
-    jwt_refresh_Secret: process.env.JWT_REFRESH_SECRET,
-    jwt_access_ExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
-    jwt_refresh_ExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+ jwt_access_secret: process.env.jwt_access_secret !,
+  jwt_refresh_secret: process.env.jwt_refresh_secret !,
+
+  jwt_access_expires_in: process.env.jwt_access_expires_in !,
+  jwt_refresh_expires_in: process.env.jwt_refresh_expires_in !
 
 
 };

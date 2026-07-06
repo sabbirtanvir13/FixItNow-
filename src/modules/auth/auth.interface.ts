@@ -6,3 +6,9 @@ export interface RegisterUserPayload {
   role?: 'Customer' | 'Technician';
   profilephoto: string;
 }
+
+
+export interface ILoginUser {
+  email : string;
+  password :string;
+}
