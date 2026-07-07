@@ -37,6 +37,7 @@ model TechnicianProfile {
 
   services Service[]
 
+  bookings Booking[] @relation("technicianBookings")
 
 user User @relation(fields: [userId], references: [id])
 

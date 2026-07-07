@@ -20,6 +20,7 @@ model User {
   active_status Active_Status @default(Active)
   created_at    DateTime      @default(now())
   updated_at    DateTime      @updatedAt
+  customerBookings Booking[] @relation("customerBookings")
 
    technicianProfile TechnicianProfile?
 }

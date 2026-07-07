@@ -5,6 +5,8 @@ import config from "./config";
 import { userRoutes } from "./modules/auth/auth.route";
 import { technicianRoutes } from "./modules/technician/technician.route";
 import { categoryRoutes } from "./modules/Category/category.route";
+import { serviceRoutes } from "./modules/service/service.route";
+import { bookingRoutes } from "./modules/booking/booking.route";
 
 const app : Application = express();
 
@@ -37,6 +39,21 @@ technicianRoutes
 app.use(
  "/api/categories",
  categoryRoutes
+);
+
+
+app.use(
+"/api/technician/services",
+serviceRoutes
+);
+
+app.use("/api/services", serviceRoutes);
+
+
+
+app.use(
+ "/api/bookings",
+ bookingRoutes
 );
 
 export default app;

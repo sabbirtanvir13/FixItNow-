@@ -8,3 +8,19 @@ enum Active_Status {
   Active
   Blocked
 }
+
+
+enum ServiceStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum Booking_Status {
+  REQUESTED
+  ACCEPTED
+  DECLINED
+  PAID
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
