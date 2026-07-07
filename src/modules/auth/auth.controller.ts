@@ -72,7 +72,7 @@ const getMe = catchAsync(
 
    
 
-    const profile = await AuthService.getMeIntoBD(VerifiedtokenResponse.id);
+    const profile = await AuthService.getMeIntoDB(VerifiedtokenResponse.id);
 
     sendResponse(res, {
       success: true,

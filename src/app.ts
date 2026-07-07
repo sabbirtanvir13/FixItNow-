@@ -3,6 +3,7 @@ import express, { Application,Request,Response } from "express";
 import cors from "cors";
 import config from "./config";
 import { userRoutes } from "./modules/auth/auth.route";
+import { technicianRoutes } from "./modules/technician/technician.route";
 
 const app : Application = express();
 
@@ -21,6 +22,14 @@ app.get('/', async(req :Request, res:Response) => {
   res.send('Hello World!')
 })
 
-app.use("/api/auth",userRoutes);
+app.use(
+  "/api/auth",
+  userRoutes
+);
+
+app.use(
+"/api/technician",
+technicianRoutes
+);
 
 export default app;
