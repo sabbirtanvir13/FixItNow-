@@ -70,6 +70,8 @@ const getMe = catchAsync(
       throw new Error(VerifiedtokenResponse);
     }
 
+   
+
     const profile = await AuthService.getMeIntoBD(VerifiedtokenResponse.id);
 
     sendResponse(res, {
@@ -81,8 +83,24 @@ const getMe = catchAsync(
   },
 );
 
+
+  const updatedProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+   const userId = req.user?.id as string;
+   const payload = req.body;
+
+   const updatedUser = await AuthService.updateProfileIntoDB(userId, payload);
+
+   sendResponse(res, {
+     success: true,
+     statusCode: httpStatus.OK,
+     message: "Profile updated successfully",
+     data: { user: updatedUser },
+   });
+ });
+
 export const AuthController = {
   RegisterUser,
   loginUser,
-  getMe
+  getMe,
+  updatedProfile,
 };

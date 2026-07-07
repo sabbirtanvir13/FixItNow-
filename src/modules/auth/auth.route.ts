@@ -1,13 +1,21 @@
 import {  Router } from "express";
 
 import { AuthController,  } from "./auth.controller";
+
+import { Role } from "../../../generated/prisma/client";
+import { auth } from "../../middlewares/auth";
+
  const router = Router();
 
  router.post("/register",AuthController.RegisterUser);
   
  router.post("/login", AuthController.loginUser);
 
-router.get("/me", AuthController.getMe);
+
+router.get("/me", auth(Role.Admin,Role.Customer,Role.Technician) ,AuthController.getMe)
+
+router.put("/updateProfile", auth(Role.Admin,Role.Customer,Role.Technician), AuthController.updatedProfile);
 
 
  export const  userRoutes=router;
+

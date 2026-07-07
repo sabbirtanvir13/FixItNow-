@@ -50,51 +50,7 @@ const isUserExists = await prisma.user.findUnique({
  
 }
 
-//  const loginUserIntoDB  = async (payload: ILoginUser) => {
-  
-// const  { email, password } = payload;
 
-// const user = await prisma.user.findUniqueOrThrow({
-//   where: { email },
-
-// });  
-
-//    const isPasswordMatched = await bcrypt.compare(password, user.password);
-//     if (!isPasswordMatched) {
-//       throw new Error("Invalid password");
-//     }
-
-// const jwtPayload = {
-//     id: user.id,
-//     name: user.name,
-//     email: user.email,
-//     role: user.role,
-//     };
-
-//     const accessToken = jwtUtils.createToken(
-//     jwtPayload, 
-//     config.jwt_access_Secret,
-//     config.jwt_access_expires_in as SignOptions
-//     );
-
-
-//     const refreshToken = jwtUtils.createToken(
-//     jwtPayload, 
-//     config.jwt_refresh_secret, 
-//     config.jwt_refresh_expires_in as SignOptions);
-// return {
-//     accessToken,
-//     refreshToken,
-// }
-// }
-
-
-//     return user;
-//  }
-// export const AuthService = {
-//   RegisterUserIntoDB,
-//   loginUserIntoDB,
-// }
 
 const loginUserIntoDB = async (payload: ILoginUser) => {
   const { email, password } = payload;
@@ -155,8 +111,41 @@ const user = await prisma.user.findFirstOrThrow({
 
     return user;
 }
+
+
+
+const updateProfileIntoDB = async (userId: string, payload: any) => {
+ const { name, email, profilePhoto, bio, experience_years } = payload;
+
+ const updatedUser = await prisma.user.update({
+   where: { id: userId },
+   data: {
+      name,
+      email,
+      profile: {
+        update: {
+          profilePhoto,
+          bio,
+          experience_years,
+        },
+      },
+   },
+  
+   omit: {
+     password: true,
+   },
+   include: {
+     profile: true,
+   },
+
+ });
+
+ return updatedUser;
+};
+
 export const AuthService = {
   RegisterUserIntoDB,
   loginUserIntoDB,
   getMeIntoBD,
-};
+  updateProfileIntoDB,
+}
