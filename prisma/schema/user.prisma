@@ -1,26 +1,21 @@
-// model User {
-//   id             String @id @default(uuid())
-//   name           String @db.VarChar(255)
-//   email          String @unique
-//   password       String
-//   role           Role @default(Customer)
-//   active_status  Active_Status @default(Active)
-//   created_at     DateTime @default(now())
-//   updated_at     DateTime @updatedAt
-
-//   profile Profile?
-// }
-
 model User {
+
   id            String        @id @default(uuid())
   name          String        @db.VarChar(255)
   email         String        @unique
   password      String
   role          Role          @default(Customer)
   active_status Active_Status @default(Active)
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @updatedAt
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+
   customerBookings Booking[] @relation("customerBookings")
 
-   technicianProfile TechnicianProfile?
+  customerReviews Review[] @relation("customerReviews")
+
+
+  technicianProfile TechnicianProfile?
+
 }

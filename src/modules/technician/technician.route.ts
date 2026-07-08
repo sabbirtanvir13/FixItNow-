@@ -32,5 +32,22 @@ TechnicianController.getTechnicianProfile
 );
 
 
+// Technician bookings
+router.get(
+  "/bookings",
+  auth(Role.Technician),
+  TechnicianController.getTechnicianBookings
+);
+
+
+router.patch(
+  "/bookings/:id",
+  auth(Role.Technician),
+  TechnicianController.updateBookingStatus
+);
+
+
+
+
 
 export const technicianRoutes = router;

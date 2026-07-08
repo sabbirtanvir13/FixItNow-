@@ -92,11 +92,124 @@ return profile;
 
 
 
+const getTechnicianBookingsFromDB = async(
+ userId:string
+)=>{
+
+
+const technician =
+await prisma.technicianProfile.findUniqueOrThrow({
+
+where:{
+ userId
+}
+
+});
+
+
+
+const bookings =
+await prisma.booking.findMany({
+
+where:{
+ technician_id: technician.id
+},
+
+
+include:{
+
+
+customer:{
+ select:{
+  id:true,
+  name:true,
+  email:true
+ }
+},
+
+
+service:true
+
+
+},
+
+
+orderBy:{
+ created_at:"desc"
+}
+
+
+});
+
+
+return bookings;
+
+};
+
+
+
+
+
+const updateBookingStatusIntoDB = async(
+ userId:string,
+ bookingId:string,
+ status:any
+)=>{
+
+
+const technician =
+await prisma.technicianProfile.findUniqueOrThrow({
+
+where:{
+ userId
+}
+
+});
+
+
+
+const booking =
+await prisma.booking.findFirstOrThrow({
+
+where:{
+ id:bookingId,
+ technician_id:technician.id
+}
+
+});
+
+
+
+const updatedBooking =
+await prisma.booking.update({
+
+where:{
+ id:booking.id
+},
+
+
+data:{
+ status
+}
+
+});
+
+
+return updatedBooking;
+
+
+};
+
+
 
 export const TechnicianService={
 
  updateTechnicianProfileIntoDB,
 
- getTechnicianProfileFromDB
+ getTechnicianProfileFromDB,
+ getTechnicianBookingsFromDB,
+
+updateBookingStatusIntoDB
+
 
 };

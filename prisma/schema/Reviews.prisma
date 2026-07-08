@@ -1,0 +1,34 @@
+model Review {
+
+  id String @id @default(uuid())
+
+
+  booking_id String @unique
+
+  customer_id String
+
+  technician_id String
+
+
+  rating Int
+
+  comment String?
+
+
+  booking Booking @relation(fields:[booking_id],references:[id])
+
+
+  customer User @relation("customerReviews",fields:[customer_id],references:[id])
+
+
+  technician TechnicianProfile @relation( "technicianReviews", fields:[technician_id], references:[id])
+
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+
+
+  @@map("reviews")
+
+}

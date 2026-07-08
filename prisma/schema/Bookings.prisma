@@ -23,14 +23,16 @@ model Booking {
   status Booking_Status @default(REQUESTED)
 
 
-
-  customer User @relation("customerBookings",fields:[customer_id], references:[id] )
-
-
-  technician TechnicianProfile @relation("technicianBookings",fields:[technician_id],references:[id])
+  customer User @relation("customerBookings",fields:[customer_id],references:[id])
 
 
-  service Service @relation(fields:[service_id],references:[id])
+  technician TechnicianProfile @relation("technicianBookings",fields:[technician_id], references:[id] )
+
+
+  service Service @relation(fields:[service_id],references:[id] )
+
+
+  review Review?
 
 
   created_at DateTime @default(now())
