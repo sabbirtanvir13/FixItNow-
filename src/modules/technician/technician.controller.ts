@@ -4,7 +4,6 @@ import { TechnicianService } from "./technician.service";
 import { sendResponse } from "../../utlis/sendResponse";
 import { catchAsync } from "../../utlis/catchAsync";
 
-
 const updateTechnicianProfile =
 catchAsync(async(
  req:Request,
@@ -44,7 +43,6 @@ data:profile
 
 });
 
-
 const getTechnicianProfile =
 catchAsync(async(
 req:Request,
@@ -77,7 +75,6 @@ data:profile
 
 });
 
-
 const getTechnicianBookings =
 catchAsync(async(
 req:Request,
@@ -109,7 +106,6 @@ data:bookings
 
 
 });
-
 
 const updateBookingStatus =
 catchAsync(async(
@@ -148,8 +144,6 @@ data:booking
 
 
 });
-
-
 
 const getAllTechnicians =
 catchAsync(async(
@@ -207,13 +201,50 @@ data:technician
 
 });
 
+const updateAvailability =
+catchAsync(async(
+req:Request,
+res:Response
+)=>{
+
+
+const availability =await TechnicianService.updateAvailabilityIntoDB(
+
+req.user!.id,
+
+req.body
+
+);
+
+sendResponse(res,{
+
+success:true,
+
+statusCode:httpStatus.OK,
+
+message:"Availability updated successfully",
+
+data:availability
+
+});
+
+
+});
+
 export const TechnicianController={
 
 updateTechnicianProfile,
 
 getTechnicianProfile,
+
 getTechnicianBookings,
+
 getAllTechnicians,
+
 updateBookingStatus,
-getSingleTechnician
+
+getSingleTechnician,
+
+updateAvailability
+
 };

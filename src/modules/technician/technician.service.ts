@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import { UpdateTechnicianProfilePayload } from "./technician.interface";
+import { AvailabilityPayload, UpdateTechnicianProfilePayload } from "./technician.interface";
 
 
 
@@ -52,17 +52,11 @@ const updateTechnicianProfileIntoDB = async (
 
 };
 
-
-
-
-
 const getTechnicianProfileFromDB = async(
  userId:string
 )=>{
 
-
-const profile =
- await prisma.technicianProfile.findUniqueOrThrow({
+const profile =await prisma.technicianProfile.findUniqueOrThrow({
 
  where:{
   userId
@@ -82,15 +76,9 @@ const profile =
 
 
  });
-
-
-
 return profile;
 
-
 };
-
-
 
 const getTechnicianBookingsFromDB = async(
  userId:string
@@ -147,9 +135,6 @@ return bookings;
 };
 
 
-
-
-
 const updateBookingStatusIntoDB = async(
  userId:string,
  bookingId:string,
@@ -201,7 +186,6 @@ return updatedBooking;
 };
 
 
-
 const getAllTechniciansFromDB = async () => {
  const technicians =await prisma.technicianProfile.findMany({
 
@@ -244,44 +228,99 @@ where:{
  id
 },
 include:{
-user:{
- select:{
-  id:true,
-  name:true,
-  email:true
- }
-},
+ user:{
+  select:{
+   id:true,
+   name:true,
+   email:true
+  }
+ },
 
-services:{
- include:{
-  category:true
- }
-},
+ services:{
+  include:{
+   category:true
+  }
+ },
 
-reviews:{
- include:{
-  customer:{
-   select:{
-    id:true,
-    name:true
+ reviews:{
+  include:{
+   customer:{
+    select:{
+     id:true,
+     name:true
+    }
    }
   }
- }
+ },
+
+ availabilities:true
 }
-
-
-}
-
 
 });
-
 
 return technician;
 
 };
 
 
+const updateAvailabilityIntoDB = async(
+ userId:string,
+ payload:AvailabilityPayload[]
+)=>{
 
+
+const technician =
+await prisma.technicianProfile.findUniqueOrThrow({
+
+where:{
+ userId
+}
+
+});
+
+
+
+await prisma.availability.deleteMany({
+
+where:{
+ technician_id:technician.id
+}
+
+});
+
+
+
+await prisma.availability.createMany({
+
+data:
+payload.map((item)=>({
+
+technician_id:technician.id,
+
+day:item.day,
+
+start_time:item.start_time,
+
+end_time:item.end_time,
+
+is_available:item.is_available ?? true
+
+}))
+
+});
+
+
+
+return await prisma.availability.findMany({
+
+where:{
+ technician_id:technician.id
+}
+
+});
+
+
+};
 
 export const TechnicianService={
 
@@ -290,7 +329,6 @@ getTechnicianProfileFromDB,
 getTechnicianBookingsFromDB,
 getAllTechniciansFromDB,
 getSingleTechnicianFromDB,
-updateBookingStatusIntoDB
-
-
+updateBookingStatusIntoDB,
+updateAvailabilityIntoDB
 };

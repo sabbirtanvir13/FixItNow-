@@ -1,0 +1,25 @@
+model Availability {
+
+  id String @id @default(uuid())
+
+  technician_id String
+
+  day String
+
+  start_time String
+
+  end_time String
+
+  is_available Boolean @default(true)
+
+
+  technician TechnicianProfile @relation(fields: [technician_id],references: [id])
+
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+
+
+  @@map("availabilities")
+}

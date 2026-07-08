@@ -23,7 +23,8 @@ model TechnicianProfile {
   bookings Booking[] @relation("technicianBookings")
 
   reviews Review[] @relation("technicianReviews")
-
+  
+  availabilities Availability[]
 
   user User @relation(fields:[userId],references:[id])
 

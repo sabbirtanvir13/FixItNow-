@@ -6,3 +6,16 @@ export interface UpdateTechnicianProfilePayload {
   location?: string;
   hourly_rate?: number;
 }
+
+
+export interface AvailabilityPayload {
+
+  day:string;
+
+  start_time:string;
+
+  end_time:string;
+
+  is_available?:boolean;
+
+}
