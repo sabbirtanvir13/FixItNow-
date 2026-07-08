@@ -25,7 +25,11 @@ PaymentController.createPayment
 );
 
 
-
+router.post(
+  "/confirm",
+  auth(Role.Customer),
+  PaymentController.confirmPayment
+);
 
 
 // SSL callback

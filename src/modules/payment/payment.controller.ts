@@ -213,7 +213,25 @@ data:payment
 
 });
 
+const confirmPayment =
+catchAsync(async (
+  req: Request,
+  res: Response
+) => {
 
+  const payment =
+  await PaymentService.paymentSuccessIntoDB(
+    req.body.tran_id
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Payment confirmed successfully",
+    data: payment
+  });
+
+});
 
 
 export const PaymentController={
@@ -229,7 +247,8 @@ paymentCancel,
 
 getMyPayments,
 
-getSinglePayment
+getSinglePayment,
+confirmPayment
 
 
 };
