@@ -8,8 +8,7 @@ const createReviewIntoDB = async(
  payload:ICreateReview
 )=>{
 
-const booking =
-await prisma.booking.findFirstOrThrow({
+const booking = await prisma.booking.findFirstOrThrow({
 
 where:{
 
@@ -24,8 +23,7 @@ status:Booking_Status.COMPLETED
 });
 
 
-const alreadyReviewed =
-await prisma.review.findUnique({
+const alreadyReviewed =await prisma.review.findUnique({
 
 where:{
  booking_id:payload.booking_id
@@ -40,8 +38,7 @@ throw new Error("Review already submitted");
 }
 
 
-const review =
-await prisma.review.create({
+const review =await prisma.review.create({
 
 data:{
 

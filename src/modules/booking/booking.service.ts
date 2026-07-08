@@ -23,25 +23,19 @@ const booking = await prisma.booking.create({
 
  data:{
 
-
   customer_id:userId,
-
   technician_id:service.technician_id,
-
   service_id:payload.service_id,
 
-
   booking_date:new Date(payload.booking_date),
-
   start_time:payload.start_time,
-
   end_time:payload.end_time,
-
-
   price:payload.price ?? service.price
 
 
  }
+
+
 
 });
 
@@ -51,6 +45,7 @@ return booking;
 
 
 };
+
 
 
 
@@ -102,11 +97,6 @@ return bookings;
 
 
 };
-
-
-
-
-
 
 
 

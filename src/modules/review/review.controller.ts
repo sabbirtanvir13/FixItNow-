@@ -8,11 +8,8 @@ import { catchAsync } from "../../utlis/catchAsync";
 const createReview = catchAsync(
 async(req:Request,res:Response)=>{
 
-const review =
-await ReviewService.createReviewIntoDB(
-
+const review =await ReviewService.createReviewIntoDB(
 req.user!.id,
-
 req.body
 
 );
