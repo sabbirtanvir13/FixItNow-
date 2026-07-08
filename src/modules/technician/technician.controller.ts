@@ -5,10 +5,6 @@ import { sendResponse } from "../../utlis/sendResponse";
 import { catchAsync } from "../../utlis/catchAsync";
 
 
-
-
-
-
 const updateTechnicianProfile =
 catchAsync(async(
  req:Request,
@@ -49,11 +45,6 @@ data:profile
 });
 
 
-
-
-
-
-
 const getTechnicianProfile =
 catchAsync(async(
 req:Request,
@@ -87,7 +78,6 @@ data:profile
 });
 
 
-
 const getTechnicianBookings =
 catchAsync(async(
 req:Request,
@@ -119,9 +109,6 @@ data:bookings
 
 
 });
-
-
-
 
 
 const updateBookingStatus =
@@ -164,13 +151,69 @@ data:booking
 
 
 
+const getAllTechnicians =
+catchAsync(async(
+req:Request,
+res:Response
+)=>{
+
+
+const technicians =
+await TechnicianService.getAllTechniciansFromDB();
+
+
+sendResponse(res,{
+
+success:true,
+
+statusCode:httpStatus.OK,
+
+message:"Technicians fetched successfully",
+
+data:technicians
+
+});
+
+
+});
+
+
+const getSingleTechnician =
+catchAsync(async(
+req:Request,
+res:Response
+)=>{
+
+
+const technician =await TechnicianService.getSingleTechnicianFromDB(
+
+req.params.id as string
+
+);
+
+
+sendResponse(res,{
+
+success:true,
+
+statusCode:httpStatus.OK,
+
+message:"Technician fetched successfully",
+
+data:technician
+
+});
+
+
+});
+
 export const TechnicianController={
 
 updateTechnicianProfile,
 
 getTechnicianProfile,
 getTechnicianBookings,
-
-updateBookingStatus
-
+getAllTechnicians,
+updateBookingStatus,
+getSingleTechnician
 };
