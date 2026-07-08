@@ -6,6 +6,8 @@ import { jwtUtils } from "../utlis/jwt";
 import { prisma } from "../lib/prisma";
 import { JwtPayload } from "jsonwebtoken";
 
+
+
 declare global {
     namespace Express {
         interface Request {

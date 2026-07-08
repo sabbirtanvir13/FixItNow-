@@ -23,6 +23,8 @@ model Booking {
   status Booking_Status @default(REQUESTED)
 
 
+  payment Payment?
+  
   customer User @relation("customerBookings",fields:[customer_id],references:[id])
 
 

@@ -1,0 +1,68 @@
+model Payment {
+
+  id String @id @default(uuid())
+
+
+  booking_id String @unique
+
+
+  transaction_id String @unique
+
+
+  amount Float
+
+
+  method Payment_Method
+
+
+  provider Payment_Provider
+
+
+  status Payment_Status @default(PENDING)
+
+
+  paid_at DateTime?
+
+
+  booking Booking @relation( fields:[booking_id], references:[id])
+
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+
+
+  @@map("payments")
+
+}
+
+
+
+enum Payment_Method {
+
+  CARD
+  MOBILE_BANKING
+  BANK_TRANSFER
+  CASH
+
+}
+
+
+
+enum Payment_Provider {
+
+  STRIPE
+  SSLCOMMERZ
+
+}
+
+
+
+enum Payment_Status {
+
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+
+}
