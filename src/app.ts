@@ -13,6 +13,7 @@ import { reviewRoutes } from "./modules/review/review.route";
 import { adminRoutes } from "./modules/Admin/admin.route";
 import { paymentRoutes } from "./modules/payment/payment.route";
 import { notFound } from "./middlewares/notFound";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 
 const app: Application = express();
 
@@ -61,4 +62,5 @@ app.use("/api/payments",paymentRoutes);
 
 
 app.use(notFound)
+app.use(globalErrorHandler);
 export default app;
