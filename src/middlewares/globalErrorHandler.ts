@@ -11,7 +11,7 @@ export const globalErrorHandler = (
 ) => {
   console.log("Error : ", err);
 
-  let statusCode;
+  let statusCode = err.statusCode;
   let errorMessage = err.message || "Internal Server Error";
   let errorName = err.name || "Internal Server Error";
 

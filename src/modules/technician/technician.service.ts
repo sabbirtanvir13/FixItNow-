@@ -154,7 +154,7 @@ where:{
 
 
 const booking =
-await prisma.booking.findFirstOrThrow({
+await prisma.booking.findFirst({
 
 where:{
  id:bookingId,
@@ -163,7 +163,11 @@ where:{
 
 });
 
-
+if (!booking) {
+    const error: any = new Error("Booking not found or you don't have permission to update it.");
+    error.statusCode = 404;
+    throw error;
+}
 
 const updatedBooking =
 await prisma.booking.update({
