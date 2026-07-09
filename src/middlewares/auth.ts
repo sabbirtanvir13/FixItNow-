@@ -5,7 +5,7 @@ import config from "../config";
 import { jwtUtils } from "../utlis/jwt";
 import { prisma } from "../lib/prisma";
 import { JwtPayload } from "jsonwebtoken";
-import { Role } from "../../generated/prisma/enums";
+import { Role ,Active_Status} from "../../generated/prisma/enums";
 
 
 
