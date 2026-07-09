@@ -33,19 +33,25 @@ export const auth = (...requiredRoles : Role[]) => {
             : req.headers.authorization;
 
         if(!token){
-            throw new Error("You are not logged in. Please log in to access this resource.");
+            const error: any = new Error("You are not logged in. Please log in to access this resource.");
+            error.statusCode = 401;
+            throw error;
         }
 
         const verifiedToken = jwtUtils.verifyToken(token, config.jwt_access_secret);
 
         if (!verifiedToken.success) {
-            throw new Error(verifiedToken.error);
+            const error: any = new Error(verifiedToken.error);
+            error.statusCode = 401;
+            throw error;
         }
 
         const { email, name, id, role } = verifiedToken.data as JwtPayload;
 
         if(requiredRoles.length && !requiredRoles.includes(role)){
-            throw new Error("Forbidden. You don't have permission to access this resource.");
+            const error: any = new Error("Forbidden. You don't have permission to access this resource.");
+            error.statusCode = 403;
+            throw error;
         }
 
         const user = await prisma.user.findUnique({
@@ -55,12 +61,16 @@ export const auth = (...requiredRoles : Role[]) => {
         });
 
         if(!user){
-            throw new Error("User not found. Please log in again.");
+            const error: any = new Error("User not found. Please log in again.");
+            error.statusCode = 401;
+            throw error;
         }
 
         if (user.active_status === Active_Status.Blocked) {
-    throw new Error("Your account has been blocked. Please contact support.");
-     }
+            const error: any = new Error("Your account has been blocked. Please contact support.");
+            error.statusCode = 403;
+            throw error;
+        }
 
         req.user = {
             email,
