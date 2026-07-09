@@ -93,10 +93,6 @@ const initialPayment = async (
 
 
 
-  console.log(
-    "PAYMENT DATA =====>",
-    paymentData
-  );
 
 
 
@@ -127,11 +123,6 @@ const initialPayment = async (
   const data = response.data;
 
 
-
-  console.log(
-    "SSL RESPONSE =====>",
-    data
-  );
 
   if(data.status !== "SUCCESS"){
 

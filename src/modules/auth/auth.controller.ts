@@ -31,20 +31,34 @@ const loginUser = catchAsync(async (req: Request, res: Response,next: NextFuncti
    const {accessToken, refreshToken} = await AuthService.loginUserIntoDB(payload);
 
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "none",
-      maxAge: 1000 * 60 * 60 * 24,
-    });
+    // res.cookie("accessToken", accessToken, {
+    //   httpOnly: true,
+    //   secure: false,
+    //   sameSite: "none",
+    //   maxAge: 1000 * 60 * 60 * 24,
+    // });
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "none",
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    });
+    // res.cookie("refreshToken", refreshToken, {
+    //   httpOnly: true,
+    //   secure: false,
+    //   sameSite: "none",
+    //   maxAge: 1000 * 60 * 60 * 24 * 7,
+    // });
 
+
+  res.cookie("accessToken", accessToken, {
+  httpOnly: true,
+  secure: false,
+  sameSite: "lax",
+  maxAge: 1000 * 60 * 60 * 24,
+});
+
+res.cookie("refreshToken", refreshToken, {
+  httpOnly: true,
+  secure: false,
+  sameSite: "lax",
+  maxAge: 1000 * 60 * 60 * 24 * 7,
+});
 
 
  sendResponse(res, {
@@ -98,9 +112,40 @@ const getMe = catchAsync(
    });
  });
 
+
+
+const refreshToken = catchAsync(
+  async (req: Request, res: Response) => {
+    const token = req.cookies.refreshToken;
+
+    if (!token) {
+      throw new Error("Refresh token is missing");
+    }
+
+    const result = await AuthService.refreshTokenIntoDB(token);
+
+    res.cookie("accessToken", result.accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "none",
+      maxAge: 1000 * 60 * 60 * 24,
+    });
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Access token refreshed successfully",
+      data: result,
+    });
+  }
+);
+
+
+
 export const AuthController = {
   RegisterUser,
   loginUser,
   getMe,
   updatedProfile,
+  refreshToken
 };
