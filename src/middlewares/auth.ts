@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { Active_Status, Role } from "../../generated/prisma/enums";
+
 import { catchAsync } from "../utlis/catchAsync";
 import config from "../config";
 import { jwtUtils } from "../utlis/jwt";
 import { prisma } from "../lib/prisma";
 import { JwtPayload } from "jsonwebtoken";
+import { Role } from "../../generated/prisma/enums";
 
 
 
