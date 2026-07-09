@@ -340,23 +340,24 @@
 
 
 
+import { Booking_Status } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import {
   AvailabilityPayload,
   UpdateTechnicianProfilePayload,
-  BookingStatus
+
 } from "./technician.interface";
 import httpStatus from "http-status";
 
 
 class AppError extends Error {
 
-  statusCode:number;
+  statusCode: number;
 
   constructor(
-    statusCode:number,
-    message:string
-  ){
+    statusCode: number,
+    message: string
+  ) {
 
     super(message);
 
@@ -368,111 +369,61 @@ class AppError extends Error {
 
 
 
-const updateTechnicianProfileIntoDB = async(
- userId:string,
- payload:UpdateTechnicianProfilePayload
-)=>{
+const updateTechnicianProfileIntoDB = async (
+  userId: string,
+  payload: UpdateTechnicianProfilePayload
+) => {
 
 
-const technicianProfile =
-await prisma.technicianProfile.findUnique({
+  const technicianProfile =
+    await prisma.technicianProfile.findUnique({
 
-where:{
- userId
-}
+      where: {
+        userId
+      }
 
-});
-
-
-
-if(!technicianProfile){
-
-throw new AppError(
-httpStatus.NOT_FOUND,
-"Technician profile not found"
-);
-
-}
+    });
 
 
 
-const updatedProfile =
-await prisma.technicianProfile.update({
+  if (!technicianProfile) {
 
-where:{
- userId
-},
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Technician profile not found"
+    );
 
-data:{
-
-profilePhoto:payload.profilePhoto,
-
-bio:payload.bio,
-
-experience_years:payload.experience_years,
-
-skills:payload.skills,
-
-location:payload.location,
-
-hourly_rate:payload.hourly_rate
-
-}
-
-});
-
-
-return updatedProfile;
-
-
-};
+  }
 
 
 
+  const updatedProfile =
+    await prisma.technicianProfile.update({
+
+      where: {
+        userId
+      },
+
+      data: {
+
+        profilePhoto: payload.profilePhoto,
+
+        bio: payload.bio,
+
+        experience_years: payload.experience_years,
+
+        skills: payload.skills,
+
+        location: payload.location,
+
+        hourly_rate: payload.hourly_rate
+
+      }
+
+    });
 
 
-
-
-const getTechnicianProfileFromDB = async(
- userId:string
-)=>{
-
-
-const profile =
-await prisma.technicianProfile.findUniqueOrThrow({
-
-where:{
- userId
-},
-
-
-include:{
-
-
-user:{
-
-select:{
-
-id:true,
-
-name:true,
-
-email:true,
-
-role:true
-
-}
-
-}
-
-
-}
-
-
-});
-
-
-return profile;
+  return updatedProfile;
 
 
 };
@@ -483,68 +434,46 @@ return profile;
 
 
 
-const getTechnicianBookingsFromDB = async(
- userId:string
-)=>{
+const getTechnicianProfileFromDB = async (
+  userId: string
+) => {
 
 
-const technician =
-await prisma.technicianProfile.findUniqueOrThrow({
+  const profile =
+    await prisma.technicianProfile.findUniqueOrThrow({
 
-where:{
- userId
-}
-
-});
+      where: {
+        userId
+      },
 
 
+      include: {
 
 
-const bookings =
-await prisma.booking.findMany({
+        user: {
 
-where:{
+          select: {
 
-technician_id:technician.id
+            id: true,
 
-},
+            name: true,
 
+            email: true,
 
-include:{
+            role: true
 
+          }
 
-customer:{
-
-select:{
-
-id:true,
-
-name:true,
-
-email:true
-
-}
-
-},
+        }
 
 
-service:true
+      }
 
 
-},
+    });
 
 
-orderBy:{
-
-created_at:"desc"
-
-}
-
-
-});
-
-
-return bookings;
+  return profile;
 
 
 };
@@ -555,225 +484,68 @@ return bookings;
 
 
 
+const getTechnicianBookingsFromDB = async (
+  userId: string
+) => {
 
 
-const updateBookingStatusIntoDB = async(
+  const technician =
+    await prisma.technicianProfile.findUniqueOrThrow({
 
-userId:string,
+      where: {
+        userId
+      }
 
-bookingId:string,
+    });
 
-nextStatus:BookingStatus
 
-)=>{
 
 
+  const bookings =
+    await prisma.booking.findMany({
 
-const technician =
-await prisma.technicianProfile.findUnique({
+      where: {
 
-where:{
- userId
-}
+        technician_id: technician.id
 
-});
+      },
 
 
+      include: {
 
-if(!technician){
 
-throw new AppError(
-404,
-"Technician profile not found"
-);
+        customer: {
 
-}
+          select: {
 
+            id: true,
 
+            name: true,
 
+            email: true
 
+          }
 
-const booking =
-await prisma.booking.findFirst({
+        },
 
-where:{
 
+        service: true
 
-id:bookingId,
 
+      },
 
-technician_id:technician.id
 
+      orderBy: {
 
-}
+        created_at: "desc"
 
+      }
 
-});
 
+    });
 
 
-if(!booking){
-
-throw new AppError(
-
-404,
-
-"Booking not found or you don't have permission."
-
-);
-
-}
-
-
-
-
-const currentStatus =
-booking.status as BookingStatus;
-
-
-
-
-
-if(currentStatus==="CANCELLED"){
-
-
-throw new AppError(
-
-400,
-
-"Cancelled booking cannot be updated"
-
-);
-
-
-}
-
-
-
-
-
-if(
-nextStatus==="ACCEPTED" ||
-nextStatus==="DECLINED"
-){
-
-
-if(currentStatus!=="REQUESTED"){
-
-
-throw new AppError(
-
-400,
-
-`Can only accept or decline REQUESTED booking. Current status ${currentStatus}`
-
-);
-
-
-}
-
-
-}
-
-
-
-
-
-
-if(nextStatus==="IN_PROGRESS"){
-
-
-if(currentStatus!=="PAID"){
-
-
-throw new AppError(
-
-400,
-
-"Booking must be PAID before starting job"
-
-);
-
-
-}
-
-
-}
-
-
-
-
-
-
-if(nextStatus==="COMPLETED"){
-
-
-if(currentStatus!=="IN_PROGRESS"){
-
-
-throw new AppError(
-
-400,
-
-"Booking must be IN_PROGRESS before completing"
-
-);
-
-
-}
-
-
-}
-
-
-
-
-
-
-if(nextStatus==="PAID"){
-
-
-throw new AppError(
-
-400,
-
-"Payment status updated by payment system"
-
-);
-
-
-}
-
-
-
-
-
-
-const updatedBooking =
-await prisma.booking.update({
-
-where:{
-
-id:booking.id
-
-},
-
-
-data:{
-
-
-status:nextStatus
-
-
-}
-
-
-});
-
-
-
-return updatedBooking;
-
+  return bookings;
 
 
 };
@@ -786,63 +558,223 @@ return updatedBooking;
 
 
 
-const getAllTechniciansFromDB = async()=>{
+const updateBookingStatusIntoDB = async (
 
+  userId: string,
 
-const technicians =
-await prisma.technicianProfile.findMany({
+  bookingId: string,
 
+  nextStatus: Booking_Status
 
-include:{
-
-
-user:{
-
-select:{
-
-id:true,
-
-name:true,
-
-email:true
-
-}
-
-},
-
-
-services:{
-
-include:{
-
-category:true
-
-}
-
-},
-
-
-reviews:true
-
-
-},
+) => {
 
 
 
-orderBy:{
+  const technician =
+    await prisma.technicianProfile.findUnique({
 
+      where: {
+        userId
+      }
 
-createdAt:"desc"
-
-
-}
-
-
-});
+    });
 
 
 
-return technicians;
+  if (!technician) {
+
+    throw new AppError(
+      404,
+      "Technician profile not found"
+    );
+
+  }
+
+
+
+
+
+  const booking =
+    await prisma.booking.findFirst({
+
+      where: {
+
+
+        id: bookingId,
+
+
+        technician_id: technician.id
+
+
+      }
+
+
+    });
+
+
+
+  if (!booking) {
+
+    throw new AppError(
+
+      404,
+
+      "Booking not found or you don't have permission."
+
+    );
+
+  }
+
+
+
+
+  const currentStatus =
+    booking.status as Booking_Status;
+
+
+
+
+
+  if (currentStatus === "CANCELLED") {
+
+
+    throw new AppError(
+
+      400,
+
+      "Cancelled booking cannot be updated"
+
+    );
+
+
+  }
+
+
+
+
+
+  if (
+    nextStatus === "ACCEPTED" ||
+    nextStatus === "DECLINED"
+  ) {
+
+
+    if (currentStatus !== "REQUESTED") {
+
+
+      throw new AppError(
+
+        400,
+
+        `Can only accept or decline REQUESTED booking. Current status ${currentStatus}`
+
+      );
+
+
+    }
+
+
+  }
+
+
+
+
+
+
+  if (nextStatus === "IN_PROGRESS") {
+
+
+    if (currentStatus !== "PAID") {
+
+
+      throw new AppError(
+
+        400,
+
+        "Booking must be PAID before starting job"
+
+      );
+
+
+    }
+
+
+  }
+
+
+
+
+
+
+  if (nextStatus === "COMPLETED") {
+
+
+    if (currentStatus !== "IN_PROGRESS") {
+
+
+      throw new AppError(
+
+        400,
+
+        "Booking must be IN_PROGRESS before completing"
+
+      );
+
+
+    }
+
+
+  }
+
+
+
+
+
+
+  if (nextStatus === "PAID") {
+
+
+    throw new AppError(
+
+      400,
+
+      "Payment status updated by payment system"
+
+    );
+
+
+  }
+
+
+
+
+
+
+  const updatedBooking =
+    await prisma.booking.update({
+
+      where: {
+
+        id: booking.id
+
+      },
+
+
+      data: {
+
+
+        status: nextStatus
+
+
+      }
+
+
+    });
+
+
+
+  return updatedBooking;
+
 
 
 };
@@ -854,86 +786,155 @@ return technicians;
 
 
 
-const getSingleTechnicianFromDB = async(
-id:string
-)=>{
+
+const getAllTechniciansFromDB = async () => {
 
 
-const technician =
-await prisma.technicianProfile.findUniqueOrThrow({
+  const technicians =
+    await prisma.technicianProfile.findMany({
 
 
-where:{
-
-id
-
-},
+      include: {
 
 
-include:{
+        user: {
+
+          select: {
+
+            id: true,
+
+            name: true,
+
+            email: true
+
+          }
+
+        },
 
 
-user:{
+        services: {
 
-select:{
+          include: {
 
-id:true,
+            category: true
 
-name:true,
+          }
 
-email:true
-
-}
-
-},
+        },
 
 
-services:{
-
-include:{
-
-category:true
-
-}
-
-},
+        reviews: true
 
 
-reviews:{
-
-include:{
-
-
-customer:{
-
-select:{
-
-id:true,
-
-name:true
-
-}
-
-}
-
-
-}
-
-
-},
-
-
-availabilities:true
-
-
-}
-
-
-});
+      },
 
 
 
-return technician;
+      orderBy: {
+
+
+        createdAt: "desc"
+
+
+      }
+
+
+    });
+
+
+
+  return technicians;
+
+
+};
+
+
+
+
+
+
+
+
+const getSingleTechnicianFromDB = async (
+  id: string
+) => {
+
+
+  const technician =
+    await prisma.technicianProfile.findUniqueOrThrow({
+
+
+      where: {
+
+        id
+
+      },
+
+
+      include: {
+
+
+        user: {
+
+          select: {
+
+            id: true,
+
+            name: true,
+
+            email: true
+
+          }
+
+        },
+
+
+        services: {
+
+          include: {
+
+            category: true
+
+          }
+
+        },
+
+
+        reviews: {
+
+          include: {
+
+
+            customer: {
+
+              select: {
+
+                id: true,
+
+                name: true
+
+              }
+
+            }
+
+
+          }
+
+
+        },
+
+
+        availabilities: true
+
+
+      }
+
+
+    });
+
+
+
+  return technician;
 
 
 };
@@ -946,113 +947,113 @@ return technician;
 
 
 
-const updateAvailabilityIntoDB = async(
+const updateAvailabilityIntoDB = async (
 
-userId:string,
+  userId: string,
 
-payload:AvailabilityPayload[]
+  payload: AvailabilityPayload[]
 
-)=>{
+) => {
 
 
 
-const technician =
-await prisma.technicianProfile.findUniqueOrThrow({
+  const technician =
+    await prisma.technicianProfile.findUniqueOrThrow({
 
-where:{
- userId
-}
+      where: {
+        userId
+      }
 
-});
+    });
 
 
 
 
-if(!Array.isArray(payload)){
+  if (!Array.isArray(payload)) {
 
 
-throw new AppError(
+    throw new AppError(
 
-400,
+      400,
 
-"Availability must be array"
+      "Availability must be array"
 
-);
+    );
 
 
-}
+  }
 
 
 
 
 
 
-const result =
-await prisma.$transaction(async(tx)=>{
+  const result =
+    await prisma.$transaction(async (tx) => {
 
 
-await tx.availability.deleteMany({
+      await tx.availability.deleteMany({
 
-where:{
+        where: {
 
-technician_id:technician.id
+          technician_id: technician.id
 
-}
+        }
 
-});
+      });
 
 
 
 
 
-await tx.availability.createMany({
+      await tx.availability.createMany({
 
-data:
+        data:
 
-payload.map(item=>({
+          payload.map(item => ({
 
 
-technician_id:technician.id,
+            technician_id: technician.id,
 
 
-day:item.day,
+            day: item.day,
 
 
-start_time:item.start_time,
+            start_time: item.start_time,
 
 
-end_time:item.end_time,
+            end_time: item.end_time,
 
 
-is_available:item.is_available ?? true
+            is_available: item.is_available ?? true
 
 
-}))
+          }))
 
 
-});
+      });
 
 
 
 
 
 
-return tx.availability.findMany({
+      return tx.availability.findMany({
 
-where:{
+        where: {
 
-technician_id:technician.id
+          technician_id: technician.id
 
-}
+        }
 
-});
+      });
 
 
-});
+    });
 
 
 
-return result;
+  return result;
 
 
 
@@ -1068,25 +1069,25 @@ return result;
 export const TechnicianService = {
 
 
-updateTechnicianProfileIntoDB,
+  updateTechnicianProfileIntoDB,
 
 
-getTechnicianProfileFromDB,
+  getTechnicianProfileFromDB,
 
 
-getTechnicianBookingsFromDB,
+  getTechnicianBookingsFromDB,
 
 
-getAllTechniciansFromDB,
+  getAllTechniciansFromDB,
 
 
-getSingleTechnicianFromDB,
+  getSingleTechnicianFromDB,
 
 
-updateBookingStatusIntoDB,
+  updateBookingStatusIntoDB,
 
 
-updateAvailabilityIntoDB
+  updateAvailabilityIntoDB
 
 
 };
