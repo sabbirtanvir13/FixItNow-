@@ -16,7 +16,7 @@ id:payload.booking_id,
 
 customer_id:userId,
 
-status:Booking_Status.COMPLETED
+status:Booking_Status.PAID
 
 }
 
