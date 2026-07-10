@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { BookingController } from "./booking.controller";
-import { Role } from "../../../generated/prisma/client";
+
 import { auth } from "../../middlewares/auth";
+import { Role } from "../../../generated/prisma/enums";
 
 
 

@@ -179,6 +179,12 @@ id:payload.id
 
 });
 
+console.log("JWT Payload:", payload);
+console.log("DB User:", user);
+console.log("Required Roles:", requiredRoles);
+console.log("User Role:", user?.role);
+
+
 
 
 if(!user){
