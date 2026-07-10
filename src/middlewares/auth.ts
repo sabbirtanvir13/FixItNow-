@@ -93,9 +93,10 @@ import config from "../config";
 
 import { prisma } from "../lib/prisma";
 import { JwtPayload } from "jsonwebtoken";
-import { Role, Active_Status } from "../../generated/prisma/enums";
+
 import { catchAsync } from "../utlis/catchAsync";
 import { jwtUtils } from "../utlis/jwt";
+import { Active_Status, Role } from "../../generated/prisma/enums";
 
 
 declare global {
