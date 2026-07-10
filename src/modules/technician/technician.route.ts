@@ -91,7 +91,7 @@ TechnicianController.getTechnicianBookings
 
 router.patch(
 "/bookings/:id",
-auth(),
+auth(Role.Technician),
 TechnicianController.updateBookingStatus
 );
 
