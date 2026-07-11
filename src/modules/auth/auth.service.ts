@@ -1,6 +1,346 @@
 
 
 
+// import { prisma } from "../../lib/prisma";
+// import config from "../../config";
+// import bcrypt from "bcryptjs";
+// import { RegisterUserPayload, ILoginUser } from "./auth.interface";
+// import { jwtUtils } from "../../utlis/jwt";
+// import { SignOptions } from "jsonwebtoken";
+// import { Role } from "../../../generated/prisma/enums";
+
+
+// const RegisterUserIntoDB = async (
+//   payload: RegisterUserPayload
+// ) => {
+
+//   const {
+//     email,
+//     password,
+//     name,
+//     role,
+//     profilePhoto
+//   } = payload;
+  
+  
+// if (payload.role === 'ADMIN') {
+//     throw new Error("You are not authorized to create an Admin account! ");
+//     }
+
+//   const isUserExists = await prisma.user.findUnique({
+//     where:{
+//       email
+//     }
+//   });
+
+
+//   if(isUserExists){
+//     throw new Error("User already exists");
+//   }
+
+
+
+//   const hashedPassword = await bcrypt.hash(
+//     password,
+//     Number(config.bcrypt_Salt_Rounds)
+//   );
+
+
+
+//   const createdUser = await prisma.user.create({
+
+//     data:{
+//       email,
+//       password: hashedPassword,
+//       name,
+//       role
+//     }
+
+//   });
+
+
+
+//   // শুধু Technician হলে profile create হবে
+
+//   if(role === Role.Technician){
+
+//     await prisma.technicianProfile.create({
+
+//       data:{
+//         userId: createdUser.id,
+//         profilePhoto
+//       }
+
+//     });
+
+//   }
+
+
+
+
+//   const user = await prisma.user.findUnique({
+
+//     where:{
+//       id: createdUser.id
+//     },
+
+
+//     omit:{
+//       password:true
+//     },
+
+
+//     include:{
+//       technicianProfile:true
+//     }
+
+//   });
+
+
+
+//   return user;
+
+// };
+
+
+
+
+// // LOGIN
+
+// const loginUserIntoDB = async (
+//  payload: ILoginUser
+// )=>{
+
+
+// const {
+//  email,
+//  password
+// }=payload;
+
+
+
+// const user = await prisma.user.findUniqueOrThrow({
+
+//  where:{
+//   email
+//  }
+
+// });
+
+
+
+// const isPasswordMatched =
+//  await bcrypt.compare(
+//   password,
+//   user.password
+//  );
+
+
+
+// if(!isPasswordMatched){
+
+//  throw new Error("Invalid password");
+
+// }
+
+
+
+
+// const jwtPayload={
+
+//  id:user.id,
+//  name:user.name,
+//  email:user.email,
+//  role:user.role
+
+// };
+
+
+
+
+// const accessToken =
+// jwtUtils.createToken(
+
+//  jwtPayload,
+
+//  config.jwt_access_secret,
+
+//  config.jwt_access_expires_in as SignOptions
+
+// );
+
+
+
+
+
+// const refreshToken =
+// jwtUtils.createToken(
+
+//  jwtPayload,
+
+//  config.jwt_refresh_secret,
+
+//  config.jwt_refresh_expires_in as SignOptions
+
+// );
+
+
+
+
+// return {
+
+//  user,
+
+//  accessToken,
+
+//  refreshToken
+
+// };
+
+
+// };
+
+
+
+
+
+// const refreshTokenIntoDB = async (token: string) => {
+//   const verifiedToken = jwtUtils.verifyToken(
+//     token,
+//     config.jwt_refresh_secret
+//   ) as any;
+
+//   if (typeof verifiedToken === "string") {
+//     throw new Error(verifiedToken);
+//   }
+
+//   const user = await prisma.user.findUniqueOrThrow({
+//     where: {
+//       id: verifiedToken.id,
+//     },
+//   });
+
+//   const jwtPayload = {
+//     id: user.id,
+//     name: user.name,
+//     email: user.email,
+//     role: user.role,
+//   };
+
+//   const accessToken = jwtUtils.createToken(
+//     jwtPayload,
+//     config.jwt_access_secret,
+//     config.jwt_access_expires_in as SignOptions
+//   );
+
+//   return {
+//     accessToken,
+//   };
+// };
+
+
+
+
+// // GET ME
+
+// const getMeIntoDB = async(
+//  userId:string
+// )=>{
+
+
+// const user =
+// await prisma.user.findFirstOrThrow({
+
+// where:{
+//  id:userId
+// },
+
+
+// omit:{
+//  password:true
+// },
+
+
+// include:{
+//  technicianProfile:true
+// }
+
+
+// });
+
+
+// return user;
+
+
+// };
+
+
+
+
+// // UPDATE BASIC USER INFO
+
+// const updateProfileIntoDB = async(
+
+//  userId:string,
+
+//  payload:any
+
+// )=>{
+
+
+// const updatedUser =
+// await prisma.user.update({
+
+// where:{
+//  id:userId
+// },
+
+
+// data:{
+
+//  name:payload.name
+
+// },
+
+
+
+// omit:{
+//  password:true
+// },
+
+
+// include:{
+//  technicianProfile:true
+// }
+
+
+
+// });
+
+
+// return updatedUser;
+
+
+// };
+
+
+
+
+// export const AuthService={
+
+//  RegisterUserIntoDB,
+
+//  loginUserIntoDB,
+
+//  getMeIntoDB,
+// refreshTokenIntoDB,
+
+//  updateProfileIntoDB
+
+// };
+
+
+
 import { prisma } from "../../lib/prisma";
 import config from "../../config";
 import bcrypt from "bcryptjs";
@@ -9,197 +349,106 @@ import { jwtUtils } from "../../utlis/jwt";
 import { SignOptions } from "jsonwebtoken";
 import { Role } from "../../../generated/prisma/enums";
 
+// REGISTER
+const RegisterUserIntoDB = async (payload: RegisterUserPayload) => {
+  const { email, password, name, role, profilePhoto } = payload;
 
-const RegisterUserIntoDB = async (
-  payload: RegisterUserPayload
-) => {
-
-  const {
-    email,
-    password,
-    name,
-    role,
-    profilePhoto
-  } = payload;
-
-
-  const isUserExists = await prisma.user.findUnique({
-    where:{
-      email
-    }
-  });
-
-
-  if(isUserExists){
-    throw new Error("User already exists");
+// Admin Account Creation Blocked
+  if (role === Role.Admin) {
+    throw new Error("You are not authorized to create an Admin account! Admins can only log in.");
   }
 
+  const isUserExists = await prisma.user.findUnique({
+    where: { email },
+  });
 
+  if (isUserExists) {
+    throw new Error("User already exists");
+  }
 
   const hashedPassword = await bcrypt.hash(
     password,
     Number(config.bcrypt_Salt_Rounds)
   );
 
-
-
-  const createdUser = await prisma.user.create({
-
-    data:{
-      email,
-      password: hashedPassword,
-      name,
-      role
-    }
-
-  });
-
-
-
-  // শুধু Technician হলে profile create হবে
-
-  if(role === Role.Technician){
-
-    await prisma.technicianProfile.create({
-
-      data:{
-        userId: createdUser.id,
-        profilePhoto
-      }
-
+  // Using Prisma Transaction to ensure atomic creation
+  const createdUser = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        name,
+        role,
+      },
     });
 
-  }
-
-
-
-
-  const user = await prisma.user.findUnique({
-
-    where:{
-      id: createdUser.id
-    },
-
-
-    omit:{
-      password:true
-    },
-
-
-    include:{
-      technicianProfile:true
+    // শুধু Technician হলে profile create হবে
+    if (role === Role.Technician) {
+      await tx.technicianProfile.create({
+        data: {
+          userId: user.id,
+          profilePhoto,
+        },
+      });
     }
 
+    return user;
   });
 
-
+  // Fetch the final user to return without password
+  const user = await prisma.user.findUnique({
+    where: { id: createdUser.id },
+    omit: { password: true },
+    include: { technicianProfile: true },
+  });
 
   return user;
-
 };
-
-
-
 
 // LOGIN
+const loginUserIntoDB = async (payload: ILoginUser) => {
+  const { email, password } = payload;
 
-const loginUserIntoDB = async (
- payload: ILoginUser
-)=>{
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { email },
+  });
 
+  const isPasswordMatched = await bcrypt.compare(password, user.password);
 
-const {
- email,
- password
-}=payload;
+  if (!isPasswordMatched) {
+    throw new Error("Invalid password");
+  }
 
+  const jwtPayload = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
 
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in as SignOptions
+  );
 
-const user = await prisma.user.findUniqueOrThrow({
+  const refreshToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in as SignOptions
+  );
 
- where:{
-  email
- }
+  // Remove password from user object before returning to client
+  const { password: _, ...userWithoutPassword } = user;
 
-});
-
-
-
-const isPasswordMatched =
- await bcrypt.compare(
-  password,
-  user.password
- );
-
-
-
-if(!isPasswordMatched){
-
- throw new Error("Invalid password");
-
-}
-
-
-
-
-const jwtPayload={
-
- id:user.id,
- name:user.name,
- email:user.email,
- role:user.role
-
+  return {
+    user: userWithoutPassword,
+    accessToken,
+    refreshToken,
+  };
 };
 
-
-
-
-const accessToken =
-jwtUtils.createToken(
-
- jwtPayload,
-
- config.jwt_access_secret,
-
- config.jwt_access_expires_in as SignOptions
-
-);
-
-
-
-
-
-const refreshToken =
-jwtUtils.createToken(
-
- jwtPayload,
-
- config.jwt_refresh_secret,
-
- config.jwt_refresh_expires_in as SignOptions
-
-);
-
-
-
-
-return {
-
- user,
-
- accessToken,
-
- refreshToken
-
-};
-
-
-};
-
-
-
-
-
+// REFRESH TOKEN
 const refreshTokenIntoDB = async (token: string) => {
   const verifiedToken = jwtUtils.verifyToken(
     token,
@@ -211,9 +460,7 @@ const refreshTokenIntoDB = async (token: string) => {
   }
 
   const user = await prisma.user.findUniqueOrThrow({
-    where: {
-      id: verifiedToken.id,
-    },
+    where: { id: verifiedToken.id },
   });
 
   const jwtPayload = {
@@ -229,108 +476,36 @@ const refreshTokenIntoDB = async (token: string) => {
     config.jwt_access_expires_in as SignOptions
   );
 
-  return {
-    accessToken,
-  };
+  return { accessToken };
 };
-
-
-
 
 // GET ME
+const getMeIntoDB = async (userId: string) => {
+  const user = await prisma.user.findFirstOrThrow({
+    where: { id: userId },
+    omit: { password: true },
+    include: { technicianProfile: true },
+  });
 
-const getMeIntoDB = async(
- userId:string
-)=>{
-
-
-const user =
-await prisma.user.findFirstOrThrow({
-
-where:{
- id:userId
-},
-
-
-omit:{
- password:true
-},
-
-
-include:{
- technicianProfile:true
-}
-
-
-});
-
-
-return user;
-
-
+  return user;
 };
-
-
-
 
 // UPDATE BASIC USER INFO
+const updateProfileIntoDB = async (userId: string, payload: any) => {
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: { name: payload.name },
+    omit: { password: true },
+    include: { technicianProfile: true },
+  });
 
-const updateProfileIntoDB = async(
-
- userId:string,
-
- payload:any
-
-)=>{
-
-
-const updatedUser =
-await prisma.user.update({
-
-where:{
- id:userId
-},
-
-
-data:{
-
- name:payload.name
-
-},
-
-
-
-omit:{
- password:true
-},
-
-
-include:{
- technicianProfile:true
-}
-
-
-
-});
-
-
-return updatedUser;
-
-
+  return updatedUser;
 };
 
-
-
-
-export const AuthService={
-
- RegisterUserIntoDB,
-
- loginUserIntoDB,
-
- getMeIntoDB,
-refreshTokenIntoDB,
-
- updateProfileIntoDB
-
+export const AuthService = {
+  RegisterUserIntoDB,
+  loginUserIntoDB,
+  refreshTokenIntoDB,
+  getMeIntoDB,
+  updateProfileIntoDB,
 };
