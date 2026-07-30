@@ -31,34 +31,21 @@ const loginUser = catchAsync(async (req: Request, res: Response,next: NextFuncti
    const {accessToken, refreshToken} = await AuthService.loginUserIntoDB(payload);
 
 
-    // res.cookie("accessToken", accessToken, {
-    //   httpOnly: true,
-    //   secure: false,
-    //   sameSite: "none",
-    //   maxAge: 1000 * 60 * 60 * 24,
-    // });
-
-    // res.cookie("refreshToken", refreshToken, {
-    //   httpOnly: true,
-    //   secure: false,
-    //   sameSite: "none",
-    //   maxAge: 1000 * 60 * 60 * 24 * 7,
-    // });
-
-
+// ব্রাউজারে accessToken কুকি সেট করা
   res.cookie("accessToken", accessToken, {
-  httpOnly: true,
-  secure: false,
-  sameSite: "lax",
-  maxAge: 1000 * 60 * 60 * 24,
-});
+    httpOnly: true,
+    secure: false, // প্রোডাকশনে true হবে যদি https থাকে
+    sameSite: "lax",
+    maxAge: 1000 * 60 * 60 * 24,
+  });
 
-res.cookie("refreshToken", refreshToken, {
-  httpOnly: true,
-  secure: false,
-  sameSite: "lax",
-  maxAge: 1000 * 60 * 60 * 24 * 7,
-});
+  // ব্রাউজারে refreshToken কুকি সেট করা
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  });
 
 
  sendResponse(res, {
@@ -86,7 +73,7 @@ const getMe = catchAsync(
 
    
 
-    const profile = await AuthService.getMeIntoDB(VerifiedtokenResponse.id);
+    const profile = await AuthService.getMeIntoDB(req.user!.id);
 
     sendResponse(res, {
       success: true,
