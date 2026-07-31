@@ -1,5 +1,18 @@
+import httpStatus from "http-status";
 import { prisma } from "../../lib/prisma";
-import { ICreateService } from "./service.interface";
+import { ICreateService, IUpdateService } from "./service.interface";
+
+class AppError extends Error {
+  statusCode: number;
+
+  constructor(
+    statusCode: number,
+    message: string
+  ) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}
 
 
 
@@ -403,10 +416,107 @@ return service;
 
 
 
+const getMyServicesFromDB = async (userId: string) => {
+  const technician =
+    await prisma.technicianProfile.findUniqueOrThrow({
+      where: {
+        userId,
+      },
+    });
+
+  return prisma.service.findMany({
+    where: {
+      technician_id: technician.id,
+    },
+
+    include: {
+      category: true,
+    },
+
+    orderBy: {
+      created_at: "desc",
+    },
+  });
+};
+
+const updateServiceIntoDB = async (
+  userId: string,
+  serviceId: string,
+  payload: IUpdateService
+) => {
+  const technician = await prisma.technicianProfile.findUnique({
+    where: {
+      userId,
+    },
+  });
+
+  if (!technician) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Technician profile not found"
+    );
+  }
+
+  const service = await prisma.service.findFirst({
+    where: {
+      id: serviceId,
+      technician_id: technician.id,
+    },
+  });
+
+  if (!service) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Service not found or you don't have permission"
+    );
+  }
+
+  return prisma.service.update({
+    where: {
+      id: service.id,
+    },
+    data: payload,
+  });
+};
 
 
+const deleteServiceFromDB = async (
+  userId: string,
+  serviceId: string
+) => {
+  const technician = await prisma.technicianProfile.findUnique({
+    where: {
+      userId,
+    },
+  });
 
+  if (!technician) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Technician profile not found"
+    );
+  }
 
+  const service = await prisma.service.findFirst({
+    where: {
+      id: serviceId,
+      technician_id: technician.id,
+    },
+  });
+
+  if (!service) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Service not found or you don't have permission"
+    );
+  }
+
+  return prisma.service.delete({
+    where: {
+      id: serviceId,
+    },
+  });
+};
 
 export const ServiceService={
 
@@ -415,7 +525,8 @@ createServiceIntoDB,
 
 getAllServicesFromDB,
 
-getSingleServiceFromDB
-
-
+getSingleServiceFromDB,
+getMyServicesFromDB,
+updateServiceIntoDB,
+deleteServiceFromDB
 };

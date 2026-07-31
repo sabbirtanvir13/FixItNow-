@@ -10,14 +10,32 @@ const router = Router();
 
 // Technician create service
 
-router.post("/",auth(Role.Technician),ServiceController.createService);
+router.post(
+  "/",
+  auth(Role.Technician),
+  ServiceController.createService
+);
 
+router.get(
+  "/my-services",
+  auth(Role.Technician),
+  ServiceController.getMyServices
+);
 
-router.get("/",ServiceController.getAllServices);
+router.get("/", ServiceController.getAllServices);
 
-// Single service
+router.get("/:id", ServiceController.getSingleService);
 
-router.get("/:id",ServiceController.getSingleService);
+router.patch(
+  "/:id",
+  auth(Role.Technician),
+  ServiceController.updateService
+);
 
+router.delete(
+  "/:id",
+  auth(Role.Technician),
+  ServiceController.deleteService
+);
 
 export const serviceRoutes = router;
