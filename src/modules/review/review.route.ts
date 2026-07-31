@@ -12,4 +12,28 @@ router.post(
   ReviewController.createReview
 );
 
+router.get(
+  "/my-reviews",
+  auth(Role.Customer),
+  ReviewController.getMyReviews
+);
+
+router.get(
+  "/:id",
+  auth(Role.Customer),
+  ReviewController.getSingleReview
+);
+
+router.patch(
+  "/:id",
+  auth(Role.Customer),
+  ReviewController.updateReview
+);
+
+router.delete(
+  "/:id",
+  auth(Role.Customer),
+  ReviewController.deleteReview
+);
+
 export const reviewRoutes = router;
