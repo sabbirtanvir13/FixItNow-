@@ -702,6 +702,68 @@ const updateAvailabilityIntoDB = async (
 };
 
 
+// --- নতুন অ্যাভেইল্যাবিলিটি গেট করার জন্য ---
+const getAvailabilitiesFromDB = async (userId: string) => {
+  const technician = await prisma.technicianProfile.findUniqueOrThrow({
+    where: { userId }
+  });
+
+  return await prisma.availability.findMany({
+    where: {
+      technician_id: technician.id
+    }
+  });
+};
+
+// --- নতুন অ্যাভেইল্যাবিলিটি অ্যাড (Create) করার জন্য ---
+const addAvailabilityIntoDB = async (
+  userId: string,
+  payload: AvailabilityPayload
+) => {
+  const technician = await prisma.technicianProfile.findUniqueOrThrow({
+    where: { userId }
+  });
+
+  return await prisma.availability.create({
+    data: {
+      technician_id: technician.id,
+      day: payload.day,
+      start_time: payload.start_time,
+      end_time: payload.end_time,
+      is_available: payload.is_available ?? true
+    }
+  });
+};
+
+// --- নির্দিষ্ট অ্যাভেইল্যাবিলিটি ডিলিট করার জন্য ---
+const deleteAvailabilityFromDB = async (
+  userId: string,
+  availabilityId: string
+) => {
+  const technician = await prisma.technicianProfile.findUniqueOrThrow({
+    where: { userId }
+  });
+
+  const availability = await prisma.availability.findFirst({
+    where: {
+      id: availabilityId,
+      technician_id: technician.id
+    }
+  });
+
+  if (!availability) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Availability slot not found or unauthorized"
+    );
+  }
+
+  return await prisma.availability.delete({
+    where: {
+      id: availabilityId
+    }
+  });
+};
 
 
 
@@ -715,8 +777,9 @@ export const TechnicianService = {
 
 
   getTechnicianProfileFromDB,
-
-
+  getAvailabilitiesFromDB,
+  addAvailabilityIntoDB,
+  deleteAvailabilityFromDB,
   getTechnicianBookingsFromDB,
 
 
