@@ -32,38 +32,40 @@ router.post(
 );
 
 
-// SSL callback
+// // SSL callback
 
-router.post(
+// router.post(
 
-"/success",
+// "/success",
 
-PaymentController.paymentSuccess
+// PaymentController.paymentSuccess
 
-);
-
-
-
-router.post(
-
-"/fail",
-
-PaymentController.paymentFail
-
-);
+// );
 
 
 
-router.post(
+// router.post(
 
-"/cancel",
+// "/fail",
 
-PaymentController.paymentCancel
+// PaymentController.paymentFail
 
-);
+// );
 
 
 
+// router.post(
+
+// "/cancel",
+
+// PaymentController.paymentCancel
+
+// );
+
+
+router.all("/success", PaymentController.paymentSuccess);
+router.all("/fail", PaymentController.paymentFail);
+router.all("/cancel", PaymentController.paymentCancel);
 
 
 // customer payment history
