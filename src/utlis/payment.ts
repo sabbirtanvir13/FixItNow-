@@ -14,7 +14,9 @@ const initialPayment = async (
 
 
 
-  const paymentData = {
+    const baseUrl = (config.app_url || `http://localhost:${config.PORT || 5000}`).replace(/\/$/, '');
+
+    const paymentData = {
 
     store_id: config.ssl_commerz_store_id,
 
@@ -29,18 +31,13 @@ const initialPayment = async (
 
     tran_id: tranId,
 
-    success_url: `${config.app_url || `http://localhost:${config.PORT || 5000}`}/api/payments/success`,
+    success_url: `${baseUrl}/api/payments/success`,
 
-    fail_url: `${config.app_url || `http://localhost:${config.PORT || 5000}`}/api/payments/fail`,
+    fail_url: `${baseUrl}/api/payments/fail`,
 
-    cancel_url: `${config.app_url || `http://localhost:${config.PORT || 5000}`}/api/payments/cancel`,
-
-    ipn_url: `${config.app_url || `http://localhost:${config.PORT || 5000}`}/api/payments/success`,
-
-
+    cancel_url: `${baseUrl}/api/payments/cancel`,
 
     cus_name: user.name,
-
 
     cus_email: user.email,
 
@@ -91,6 +88,19 @@ const initialPayment = async (
 
 
 
+  console.log("=== SSLCommerz Payment Data ===", JSON.stringify(paymentData, null, 2));
+
+  console.log("=== Generated Callback URLs ===", {
+
+    success: paymentData.success_url,
+
+    fail: paymentData.fail_url,
+
+    cancel: paymentData.cancel_url,
+
+
+  });
+
   const response = await axios.post(
 
 
@@ -116,6 +126,8 @@ const initialPayment = async (
 
 
   const data = response.data;
+
+  console.log("=== SSLCommerz Response Data ===", data);
 
 
 

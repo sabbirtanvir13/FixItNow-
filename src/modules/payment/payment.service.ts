@@ -43,6 +43,8 @@ const createPaymentIntoDB = async (userId: string, bookingId: string) => {
 
   const sslPayment = await paymentService.initialPayment(booking, user);
 
+  console.log("=== SSL Payment Returned Object ===", sslPayment);
+
   const payment = await prisma.payment.create({
     data: {
       booking_id: booking.id,
@@ -54,10 +56,14 @@ const createPaymentIntoDB = async (userId: string, bookingId: string) => {
     }
   });
 
-  return {
+  const returnValue = {
     payment,
     paymentUrl: sslPayment.GatewayPageURL
   };
+  
+  console.log("=== createPaymentIntoDB Return Value ===", returnValue);
+
+  return returnValue;
 };
 
 const paymentSuccessIntoDB = async (tranId: string) => {
