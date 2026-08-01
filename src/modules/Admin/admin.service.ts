@@ -62,6 +62,188 @@ return user;
 };
 
 
+const deleteUserFromDB = async(
+id:string
+)=>{
+
+const user =
+await prisma.user.findUniqueOrThrow({
+
+where:{
+ id
+}
+
+});
+
+
+await prisma.$transaction(async(tx)=>{
+
+if(user.role === "Technician"){
+
+const technician =
+await tx.technicianProfile.findUnique({
+
+where:{
+ userId:id
+}
+
+});
+
+
+if(technician){
+
+const technicianBookings =
+await tx.booking.findMany({
+
+where:{
+ technician_id:technician.id
+},
+
+select:{
+ id:true
+}
+
+});
+
+const bookingIds =
+technicianBookings.map(b => b.id);
+
+await tx.payment.deleteMany({
+
+where:{
+ booking_id:{
+  in:bookingIds
+ }
+}
+
+});
+
+await tx.review.deleteMany({
+
+where:{
+ OR:[
+  {
+   booking_id:{
+    in:bookingIds
+   }
+  },
+  {
+   technician_id:technician.id
+  }
+ ]
+}
+
+});
+
+await tx.booking.deleteMany({
+
+where:{
+ technician_id:technician.id
+}
+
+});
+
+await tx.service.deleteMany({
+
+where:{
+ technician_id:technician.id
+}
+
+});
+
+await tx.availability.deleteMany({
+
+where:{
+ technician_id:technician.id
+}
+
+});
+
+await tx.technicianProfile.delete({
+
+where:{
+ id:technician.id
+}
+
+});
+
+}
+
+}
+
+const customerBookings =
+await tx.booking.findMany({
+
+where:{
+ customer_id:id
+},
+
+select:{
+ id:true
+}
+
+});
+
+const customerBookingIds =
+customerBookings.map(b => b.id);
+
+if(customerBookingIds.length > 0){
+
+await tx.payment.deleteMany({
+
+where:{
+ booking_id:{
+  in:customerBookingIds
+ }
+}
+
+});
+
+await tx.review.deleteMany({
+
+where:{
+ booking_id:{
+  in:customerBookingIds
+ }
+}
+
+});
+
+await tx.booking.deleteMany({
+
+where:{
+ customer_id:id
+}
+
+});
+
+}
+
+await tx.review.deleteMany({
+
+where:{
+ customer_id:id
+}
+
+});
+
+await tx.user.delete({
+
+where:{
+ id
+}
+
+});
+
+});
+
+
+return null;
+
+
+};
+
+
 const getAllBookingsFromDB = async()=>{
 
 
@@ -167,6 +349,8 @@ export const AdminService={
 getAllUsersFromDB,
 
 updateUserStatusIntoDB,
+
+deleteUserFromDB,
 
 getAllBookingsFromDB,
 

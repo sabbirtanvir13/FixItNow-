@@ -55,6 +55,31 @@ data:user
 
 
 
+const deleteUser =catchAsync(async(req:Request,res:Response)=>{
+
+await AdminService.deleteUserFromDB(
+req.params.id as string
+);
+
+
+
+sendResponse(res,{
+
+success:true,
+
+statusCode:httpStatus.OK,
+
+message:"User deleted successfully",
+
+data:null
+
+});
+
+
+});
+
+
+
 const getAllBookings =catchAsync(async(req:Request,res:Response)=>{
 const bookings =await AdminService.getAllBookingsFromDB();
 
@@ -127,6 +152,8 @@ export const AdminController={
 getAllUsers,
 
 updateUserStatus,
+
+deleteUser,
 
 getAllBookings,
 

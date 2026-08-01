@@ -28,6 +28,13 @@ router.patch(
 );
 
 
+router.delete(
+  "/users/:id",
+  auth(Role.Admin),
+  AdminController.deleteUser
+);
+
+
 router.get(
   "/categories",
   auth(Role.Admin),
