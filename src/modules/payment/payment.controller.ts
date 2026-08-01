@@ -1,4 +1,3 @@
-
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 
@@ -6,8 +5,9 @@ import { catchAsync } from "../../utlis/catchAsync";
 import { sendResponse } from "../../utlis/sendResponse";
 import { PaymentService } from "./payment.service";
 
-const createPayment = catchAsync(async (req: Request, res: Response) => {
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
+const createPayment = catchAsync(async (req: Request, res: Response) => {
   const bookingId = req.body.bookingId || req.body.booking_id;
 
   if (!bookingId) {
@@ -28,30 +28,36 @@ const createPayment = catchAsync(async (req: Request, res: Response) => {
 });
 
 const paymentSuccess = catchAsync(async (req: Request, res: Response) => {
-  await PaymentService.paymentSuccessIntoDB(req.body.tran_id);
+  const tranId = req.body.tran_id || req.query.tran_id;
 
-  res.status(200).json({
-    success: true,
-    message: "Payment successful"
-  });
+  if (tranId) {
+    await PaymentService.paymentSuccessIntoDB(tranId as string);
+  }
+
+  // পেমেন্ট সফল হলে ফ্রন্টএন্ডের বুকিং বা সাকসেস পেজে রিডাইরেক্ট করুন
+  res.redirect(303, `${FRONTEND_URL}/payment/success?payment=success`);
 });
 
 const paymentFail = catchAsync(async (req: Request, res: Response) => {
-  await PaymentService.paymentFailIntoDB(req.body.tran_id);
+  const tranId = req.body.tran_id || req.query.tran_id;
 
-  res.status(200).json({
-    success: false,
-    message: "Payment failed"
-  });
+  if (tranId) {
+    await PaymentService.paymentFailIntoDB(tranId as string);
+  }
+
+  // পেমেন্ট ফেইল হলে ফ্রন্টএন্ডে রিডাইরেক্ট করুন
+  res.redirect(303, `${FRONTEND_URL}/dashboard/customer/bookings?payment=failed`);
 });
 
 const paymentCancel = catchAsync(async (req: Request, res: Response) => {
-  await PaymentService.paymentCancelIntoDB(req.body.tran_id);
+  const tranId = req.body.tran_id || req.query.tran_id;
 
-  res.status(200).json({
-    success: false,
-    message: "Payment cancelled"
-  });
+  if (tranId) {
+    await PaymentService.paymentCancelIntoDB(tranId as string);
+  }
+
+  // পেমেন্ট ক্যানসেল হলে ফ্রন্টএন্ডে রিডাইরেক্ট করুন
+  res.redirect(303, `${FRONTEND_URL}/dashboard/customer/bookings?payment=cancelled`);
 });
 
 const getMyPayments = catchAsync(async (req: Request, res: Response) => {

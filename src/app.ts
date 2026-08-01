@@ -97,7 +97,7 @@ app.use(
     origin: [
       "http://localhost:8000",
       "https://fixitnow-backend-hi9a.onrender.com",
-      config.app_url as string, // config ফাইল থেকে আসা URL
+      config.app_url as string,
     ].filter(Boolean),
     credentials: true,
   })
