@@ -28,9 +28,10 @@ const createPayment = catchAsync(async (req: Request, res: Response) => {
 });
 
 const paymentSuccess = catchAsync(async (req: Request, res: Response) => {
-  console.log("=== SSLCommerz Callback URL Hit ===");
-  console.log("req.body:", JSON.stringify(req.body, null, 2));
-  console.log("req.query:", JSON.stringify(req.query, null, 2));
+   console.log("========== SUCCESS CALLBACK ==========");
+  console.log("METHOD:", req.method);
+  console.log("BODY:", req.body);
+  console.log("QUERY:", req.query);
 
   const tranId = req.body.tran_id || req.query.tran_id || req.body.val_id;
 
