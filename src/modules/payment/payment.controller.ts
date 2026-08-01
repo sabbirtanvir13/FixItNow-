@@ -28,36 +28,45 @@ const createPayment = catchAsync(async (req: Request, res: Response) => {
 });
 
 const paymentSuccess = catchAsync(async (req: Request, res: Response) => {
-  const tranId = req.body.tran_id || req.query.tran_id;
+  const tranId = req.body.tran_id || req.query.tran_id || req.body.val_id;
 
   if (tranId) {
-    await PaymentService.paymentSuccessIntoDB(tranId as string);
+    try {
+      await PaymentService.paymentSuccessIntoDB(tranId as string);
+    } catch (err) {
+      console.error("Error in paymentSuccessIntoDB:", err);
+    }
   }
 
-  // পেমেন্ট সফল হলে ফ্রন্টএন্ডের বুকিং বা সাকসেস পেজে রিডাইরেক্ট করুন
-  res.redirect(303, `${FRONTEND_URL}/payment/success?payment=success`);
+  res.redirect(303, `${FRONTEND_URL}/payment/confirm?tran_id=${tranId || ""}&payment=success`);
 });
 
 const paymentFail = catchAsync(async (req: Request, res: Response) => {
-  const tranId = req.body.tran_id || req.query.tran_id;
+  const tranId = req.body.tran_id || req.query.tran_id || req.body.val_id;
 
   if (tranId) {
-    await PaymentService.paymentFailIntoDB(tranId as string);
+    try {
+      await PaymentService.paymentFailIntoDB(tranId as string);
+    } catch (err) {
+      console.error("Error in paymentFailIntoDB:", err);
+    }
   }
 
-  // পেমেন্ট ফেইল হলে ফ্রন্টএন্ডে রিডাইরেক্ট করুন
-  res.redirect(303, `${FRONTEND_URL}/dashboard/customer/bookings?payment=failed`);
+  res.redirect(303, `${FRONTEND_URL}/payment/confirm?tran_id=${tranId || ""}&payment=failed`);
 });
 
 const paymentCancel = catchAsync(async (req: Request, res: Response) => {
-  const tranId = req.body.tran_id || req.query.tran_id;
+  const tranId = req.body.tran_id || req.query.tran_id || req.body.val_id;
 
   if (tranId) {
-    await PaymentService.paymentCancelIntoDB(tranId as string);
+    try {
+      await PaymentService.paymentCancelIntoDB(tranId as string);
+    } catch (err) {
+      console.error("Error in paymentCancelIntoDB:", err);
+    }
   }
 
-  // পেমেন্ট ক্যানসেল হলে ফ্রন্টএন্ডে রিডাইরেক্ট করুন
-  res.redirect(303, `${FRONTEND_URL}/dashboard/customer/bookings?payment=cancelled`);
+  res.redirect(303, `${FRONTEND_URL}/payment/confirm?tran_id=${tranId || ""}&payment=cancelled`);
 });
 
 const getMyPayments = catchAsync(async (req: Request, res: Response) => {
@@ -86,7 +95,13 @@ const getSinglePayment = catchAsync(async (req: Request, res: Response) => {
 });
 
 const confirmPayment = catchAsync(async (req: Request, res: Response) => {
-  const payment = await PaymentService.paymentSuccessIntoDB(req.body.tran_id);
+  const tranId = req.body.tran_id || req.body.tranId;
+
+  if (!tranId) {
+    throw new Error("Transaction ID is missing in the request body!");
+  }
+
+  const payment = await PaymentService.paymentSuccessIntoDB(tranId);
 
   sendResponse(res, {
     success: true,

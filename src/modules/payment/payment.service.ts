@@ -61,12 +61,27 @@ const createPaymentIntoDB = async (userId: string, bookingId: string) => {
 };
 
 const paymentSuccessIntoDB = async (tranId: string) => {
+  if (!tranId) {
+    throw new Error("Transaction ID is missing!");
+  }
+
+  const isPaymentExist = await prisma.payment.findUnique({
+    where: {
+      transaction_id: tranId
+    }
+  });
+
+  if (!isPaymentExist) {
+    throw new Error(`Payment with transaction_id '${tranId}' not found!`);
+  }
+
   const payment = await prisma.payment.update({
     where: {
       transaction_id: tranId
     },
     data: {
-      status: Payment_Status.COMPLETED
+      status: Payment_Status.COMPLETED,
+      paid_at: new Date()
     }
   });
 
@@ -83,6 +98,20 @@ const paymentSuccessIntoDB = async (tranId: string) => {
 };
 
 const paymentFailIntoDB = async (tranId: string) => {
+  if (!tranId) {
+    throw new Error("Transaction ID is missing!");
+  }
+
+  const isPaymentExist = await prisma.payment.findUnique({
+    where: {
+      transaction_id: tranId
+    }
+  });
+
+  if (!isPaymentExist) {
+    throw new Error(`Payment with transaction_id '${tranId}' not found!`);
+  }
+
   return prisma.payment.update({
     where: {
       transaction_id: tranId
@@ -94,6 +123,20 @@ const paymentFailIntoDB = async (tranId: string) => {
 };
 
 const paymentCancelIntoDB = async (tranId: string) => {
+  if (!tranId) {
+    throw new Error("Transaction ID is missing!");
+  }
+
+  const isPaymentExist = await prisma.payment.findUnique({
+    where: {
+      transaction_id: tranId
+    }
+  });
+
+  if (!isPaymentExist) {
+    throw new Error(`Payment with transaction_id '${tranId}' not found!`);
+  }
+
   return prisma.payment.update({
     where: {
       transaction_id: tranId
