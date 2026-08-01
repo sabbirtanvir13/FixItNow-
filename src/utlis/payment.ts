@@ -29,13 +29,13 @@ const initialPayment = async (
 
     tran_id: tranId,
 
-    success_url: `${process.env.BACKEND_URL || process.env.SERVER_URL || `http://localhost:${config.PORT || 5000}`}/api/payments/success`,
+    success_url: `${config.app_url || `http://localhost:${config.PORT || 5000}`}/api/payments/success`,
 
-    fail_url: `${process.env.BACKEND_URL || process.env.SERVER_URL || `http://localhost:${config.PORT || 5000}`}/api/payments/fail`,
+    fail_url: `${config.app_url || `http://localhost:${config.PORT || 5000}`}/api/payments/fail`,
 
-    cancel_url: `${process.env.BACKEND_URL || process.env.SERVER_URL || `http://localhost:${config.PORT || 5000}`}/api/payments/cancel`,
+    cancel_url: `${config.app_url || `http://localhost:${config.PORT || 5000}`}/api/payments/cancel`,
 
-    ipn_url: `${process.env.BACKEND_URL || process.env.SERVER_URL || `http://localhost:${config.PORT || 5000}`}/api/payments/success`,
+    ipn_url: `${config.app_url || `http://localhost:${config.PORT || 5000}`}/api/payments/success`,
 
 
 
