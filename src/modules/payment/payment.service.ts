@@ -28,11 +28,8 @@ const createPaymentIntoDB = async (userId: string, bookingId: string) => {
     }
   });
 
-  if (existingPayment) {
-    return {
-      payment: existingPayment,
-      paymentUrl: existingPayment.payment_url
-    };
+  if (existingPayment && existingPayment.status === Payment_Status.COMPLETED) {
+    throw new Error("This booking has already been paid.");
   }
 
   const user = await prisma.user.findUniqueOrThrow({
@@ -45,16 +42,33 @@ const createPaymentIntoDB = async (userId: string, bookingId: string) => {
 
   console.log("=== SSL Payment Returned Object ===", sslPayment);
 
-  const payment = await prisma.payment.create({
-    data: {
-      booking_id: booking.id,
-      transaction_id: sslPayment.tran_id,
-      amount: booking.price,
-      provider: Payment_Provider.SSLCOMMERZ,
-      status: Payment_Status.PENDING,
-      payment_url: sslPayment.GatewayPageURL
-    }
-  });
+  let payment;
+
+  if (existingPayment) {
+    payment = await prisma.payment.update({
+      where: {
+        booking_id: bookingId
+      },
+      data: {
+        transaction_id: sslPayment.tran_id,
+        payment_url: sslPayment.GatewayPageURL,
+        status: Payment_Status.PENDING,
+        amount: booking.price,
+        provider: Payment_Provider.SSLCOMMERZ
+      }
+    });
+  } else {
+    payment = await prisma.payment.create({
+      data: {
+        booking_id: booking.id,
+        transaction_id: sslPayment.tran_id,
+        amount: booking.price,
+        provider: Payment_Provider.SSLCOMMERZ,
+        status: Payment_Status.PENDING,
+        payment_url: sslPayment.GatewayPageURL
+      }
+    });
+  }
 
   const returnValue = {
     payment,
@@ -161,7 +175,29 @@ const getMyPaymentsFromDB = async (userId: string) => {
       }
     },
     include: {
-      booking: true
+      booking: {
+        include: {
+          service: true,
+          technician: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true
+                }
+              }
+            }
+          },
+          customer: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          }
+        }
+      }
     },
     orderBy: {
       created_at: "desc"
@@ -178,7 +214,29 @@ const getSinglePaymentFromDB = async (userId: string, paymentId: string) => {
       }
     },
     include: {
-      booking: true
+      booking: {
+        include: {
+          service: true,
+          technician: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true
+                }
+              }
+            }
+          },
+          customer: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          }
+        }
+      }
     }
   });
 };

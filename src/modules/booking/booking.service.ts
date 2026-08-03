@@ -69,6 +69,8 @@ include:{
 
 
 service:true,
+payment:true,
+review:true,
 
 
 technician:{
@@ -120,6 +122,8 @@ include:{
 
 
 service:true,
+payment:true,
+review:true,
 
 
 technician:{

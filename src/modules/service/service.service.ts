@@ -58,7 +58,7 @@ title:payload.title,
 
 
 description:payload.description,
-
+image: payload.image,
 
 price:payload.price,
 

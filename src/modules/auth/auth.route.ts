@@ -4,6 +4,7 @@
 import { Router } from "express";
 import { AuthController } from "./auth.controller";
 import { auth } from "../../middlewares/auth";
+import { upload } from "../../middlewares/upload";
 import { Role } from "../../../generated/prisma/enums";
 
 
@@ -12,8 +13,9 @@ const router = Router();
 
 
 router.post(
-"/register",
-AuthController.RegisterUser
+  "/register",
+  upload.single("profileImage"),
+  AuthController.RegisterUser
 );
 
 

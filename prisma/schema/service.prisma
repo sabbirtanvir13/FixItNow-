@@ -8,10 +8,11 @@ model Service {
 
   title String
   description String?
-
+image String?
   price Float
   duration Int
   location String?
+
 
 
   technician TechnicianProfile @relation(fields: [technician_id],references: [id])
