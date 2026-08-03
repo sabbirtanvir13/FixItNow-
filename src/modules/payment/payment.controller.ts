@@ -135,7 +135,7 @@ import { sendResponse } from "../../utlis/sendResponse";
 import { PaymentService } from "./payment.service";
 
 const FRONTEND_URL =
-  process.env.FRONTEND_URL || "http://localhost:3000";
+  process.env.FRONTEND_URL || "https://fixitnow-frontend-flax.vercel.app";
 
 const createPayment = catchAsync(async (req: Request, res: Response) => {
   const bookingId = req.body.bookingId || req.body.booking_id;
