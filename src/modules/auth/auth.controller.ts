@@ -139,21 +139,51 @@ import { sendResponse } from "../../utlis/sendResponse";
 import config from "../../config";
 import { jwtUtils } from "../../utlis/jwt";
 
+// const RegisterUser = catchAsync(async (req: Request, res: Response) => {
+
+//   console.log("RegisterUser req.body:", req.body);
+//   console.log("RegisterUser req.file:", req.file);
+
+//   const bodyData = req.body?.payload || req.body || {};
+  
+//   const uploadedImage = req.file ? req.file.path || req.file.filename : undefined;
+//   const profilePhoto = uploadedImage || bodyData.profilePhoto || bodyData.profileImage;
+
+//   const payload = {
+//     ...bodyData,
+//     name: bodyData.name || req.body?.name,
+//     email: bodyData.email || req.body?.email,
+//     password: bodyData.password || req.body?.password,
+//     role: bodyData.role || req.body?.role,
+//     ...(profilePhoto ? { profilePhoto } : {}),
+//   };
+
+//   const user = await AuthService.RegisterUserIntoDB(payload);
+
+//   return sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: "Registration successful",
+//     data: user,
+//   });
+// });
+
+
 const RegisterUser = catchAsync(async (req: Request, res: Response) => {
   console.log("RegisterUser req.body:", req.body);
   console.log("RegisterUser req.file:", req.file);
 
-  const bodyData = req.body?.payload || req.body || {};
+  // FormData বা JSON যাই আসুক না কেন, ডেটা সেফলি এক্সট্রাক্ট করা
+  const bodyData = req.body || {};
   
   const uploadedImage = req.file ? req.file.path || req.file.filename : undefined;
   const profilePhoto = uploadedImage || bodyData.profilePhoto || bodyData.profileImage;
 
   const payload = {
-    ...bodyData,
-    name: bodyData.name || req.body?.name,
-    email: bodyData.email || req.body?.email,
-    password: bodyData.password || req.body?.password,
-    role: bodyData.role || req.body?.role,
+    name: bodyData.name,
+    email: bodyData.email,
+    password: bodyData.password,
+    role: bodyData.role,
     ...(profilePhoto ? { profilePhoto } : {}),
   };
 
