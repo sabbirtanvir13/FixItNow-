@@ -29,7 +29,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:8000",
-      "https://fixitnow-backend-hi9a.onrender.com",
+      "https://fixitnow-backend-one.vercel.app",
       config.app_url as string,
     ].filter(Boolean),
     credentials: true,

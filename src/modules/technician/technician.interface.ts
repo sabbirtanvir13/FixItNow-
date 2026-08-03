@@ -2,6 +2,7 @@
 
 export interface UpdateTechnicianProfilePayload {
   profilePhoto?: string;
+  name?: string;
   bio?: string;
   experience_years?: number;
   skills?: string[];
